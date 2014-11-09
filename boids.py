@@ -27,11 +27,14 @@ ylim=(-500,1500)
 frames = 50
 interval = 50
 
-boids_x=[random.uniform(*x_pos_bound) for x in range(num_boids)]
-boids_y=[random.uniform(*y_pos_bound) for x in range(num_boids)]
-boid_x_velocities=[random.uniform(*x_velocity_bound) for x in range(num_boids)]
-boid_y_velocities=[random.uniform(*y_velocity_bound) for x in range(num_boids)]
-boids=(boids_x,boids_y,boid_x_velocities,boid_y_velocities)
+def init_boids():
+	boids_x=[random.uniform(*x_pos_bound) for x in range(num_boids)]
+	boids_y=[random.uniform(*y_pos_bound) for x in range(num_boids)]
+	boid_x_velocities=[random.uniform(*x_velocity_bound) for x in range(num_boids)]
+	boid_y_velocities=[random.uniform(*y_velocity_bound) for x in range(num_boids)]
+	return (boids_x,boids_y,boid_x_velocities,boid_y_velocities)
+
+boids = init_boids()
 
 def update_boids(boids):
 	xs,ys,xvs,yvs=boids
