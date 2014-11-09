@@ -39,12 +39,15 @@ boids = init_boids()
 def update_boids(boids):
 	xs,ys,xvs,yvs=boids
 	# Fly towards the middle
-	for i in range(len(xs)):
-		for j in range(len(xs)):
-			xvs[i]=xvs[i]+(xs[j]-xs[i])*dt_middle/len(xs)
-	for i in range(len(xs)):
-		for j in range(len(xs)):
-			yvs[i]=yvs[i]+(ys[j]-ys[i])*dt_middle/len(xs)
+	length = len(xs)
+	for i,ival in enumerate(xs):
+		for j,jval in enumerate(xs):
+			xvs[i] += (jval-ival)*dt_middle/length
+
+	for i,ival in enumerate(ys):
+		for j,jval in enumerate(ys):
+			yvs[i] += (jval-ival)*dt_middle/length
+
 	# Fly away from nearby boids
 	for i in range(len(xs)):
 		for j in range(len(xs)):
