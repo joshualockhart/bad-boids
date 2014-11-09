@@ -18,8 +18,8 @@ num_boids = 50
 
 dt_middle = 0.01
 dt_match = 0.125
-clumping = 100
-speed_match = 10000
+clumping_distance = 100
+speed_match_distance = 10000
 
 xlim=(-500,1500)
 ylim=(-500,1500)
@@ -38,6 +38,7 @@ boids = init_boids()
 
 def update_boids(boids):
 	xs,ys,xvs,yvs=boids
+	
 	# Fly towards the middle
 	length = len(xs)
 	for i,ival in enumerate(xs):
@@ -48,18 +49,24 @@ def update_boids(boids):
 		for j,jval in enumerate(ys):
 			yvs[i] += (jval-ival)*dt_middle/length
 
-	# Fly away from nearby boids
+	
 	for i in range(len(xs)):
 		for j in range(len(xs)):
-			if (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2 < clumping:
-				xvs[i]=xvs[i]+(xs[i]-xs[j])
-				yvs[i]=yvs[i]+(ys[i]-ys[j])
-	# Try to match speed with nearby boids
+			distance = (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2
+			# Fly away from nearby boids		
+			if distance < clumping_distance:
+				xvs[i] += (xs[i]-xs[j])
+				yvs[i] += (ys[i]-ys[j])
+	
 	for i in range(len(xs)):
 		for j in range(len(xs)):
-			if (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2 < speed_match:
-				xvs[i]=xvs[i]+(xvs[j]-xvs[i])*dt_match/len(xs)
-				yvs[i]=yvs[i]+(yvs[j]-yvs[i])*dt_match/len(xs)
+			distance = (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2
+			# Try to match speed with nearby boids
+			if distance < speed_match_distance:
+				xvs[i] += (xvs[j]-xvs[i])*dt_match/len(xs)
+				yvs[i] += (yvs[j]-yvs[i])*dt_match/len(xs)
+			
+	
 	# Move according to velocities
 	for i in range(len(xs)):
 		xs[i]=xs[i]+xvs[i]
