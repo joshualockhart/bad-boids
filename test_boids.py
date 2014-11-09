@@ -1,4 +1,4 @@
-from boids import update_boids, calculate_distance
+from boids import update_boids, calculate_distance, fly_towards_middle
 from nose.tools import assert_almost_equal
 import os
 import yaml
@@ -30,4 +30,12 @@ def test_distance_calculation():
   distances = data["distances"]
   for i,dist in enumerate(calculated_distances):
     assert_almost_equal(dist, distances[i], delta=0.01)
+
+def test_fly_towards_middle():
+  regression_data=yaml.load(open(os.path.join(os.path.dirname(__file__),'fly_towards_middle_fixture.yml')))
+  boid_data=regression_data["before"]
+  fly_towards_middle(boid_data)
+  for after,before in zip(regression_data["after"],boid_data):
+    for after_value,before_value in zip(after,before): 
+      assert_almost_equal(after_value,before_value,delta=0.01)
 
