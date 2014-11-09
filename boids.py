@@ -28,49 +28,61 @@ frames = 50
 interval = 50
 
 def init_boids():
-	boids_x=[random.uniform(*x_pos_bound) for x in range(num_boids)]
-	boids_y=[random.uniform(*y_pos_bound) for x in range(num_boids)]
-	boid_x_velocities=[random.uniform(*x_velocity_bound) for x in range(num_boids)]
-	boid_y_velocities=[random.uniform(*y_velocity_bound) for x in range(num_boids)]
-	return (boids_x,boids_y,boid_x_velocities,boid_y_velocities)
+  boids_x=[random.uniform(*x_pos_bound) for x in range(num_boids)]
+  boids_y=[random.uniform(*y_pos_bound) for x in range(num_boids)]
+  boid_x_velocities=[random.uniform(*x_velocity_bound) for x in range(num_boids)]
+  boid_y_velocities=[random.uniform(*y_velocity_bound) for x in range(num_boids)]
+  return (boids_x,boids_y,boid_x_velocities,boid_y_velocities)
+
+def calculate_distance(xa,ya,xb,yb):
+  return (xa-xb)**2 + (ya-yb)**2
+
+def position_update(xa,xb,dt,length):
+  return (xa-xb)*dt/length
+
+def velocity_update(va,vb,dt,length):
+  return (va-vb)*dt/length
+
+def fly_towards_middle(boids):
+  xs,ys,xvs,yvs=boids
+  length = len(xs)
+  for i,ival in enumerate(xs):
+    for j,jval in enumerate(xs):
+      xvs[i] += position_update(jval,ival,dt_middle,length)
+
+  for i,ival in enumerate(ys):
+    for j,jval in enumerate(ys):
+      yvs[i] += position_update(jval,ival,dt_middle,length)
 
 boids = init_boids()
 
 def update_boids(boids):
-	xs,ys,xvs,yvs=boids
-	
-	# Fly towards the middle
-	length = len(xs)
-	for i,ival in enumerate(xs):
-		for j,jval in enumerate(xs):
-			xvs[i] += (jval-ival)*dt_middle/length
+  xs,ys,xvs,yvs=boids
+  
+  fly_towards_middle(boids)
 
-	for i,ival in enumerate(ys):
-		for j,jval in enumerate(ys):
-			yvs[i] += (jval-ival)*dt_middle/length
+  length = len(xs)
+  
+  for i in range(length):
+    for j in range(length):
+      distance = calculate_distance(xs[j],ys[j],xs[i],ys[i])
+      # Fly away from nearby boids    
+      if distance < clumping_distance:
+        xvs[i] += (xs[i]-xs[j])
+        yvs[i] += (ys[i]-ys[j])
+  
+  for i in range(length):
+    for j in range(length):
+      distance = calculate_distance(xs[j],ys[j],xs[i],ys[i])
+      # Try to match speed with nearby boids
+      if distance < speed_match_distance:
+        xvs[i] += velocity_update(xvs[j],xvs[i],dt_match,length)
+        yvs[i] += velocity_update(yvs[j],yvs[i],dt_match,length)
 
-	
-	for i in range(len(xs)):
-		for j in range(len(xs)):
-			distance = (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2
-			# Fly away from nearby boids		
-			if distance < clumping_distance:
-				xvs[i] += (xs[i]-xs[j])
-				yvs[i] += (ys[i]-ys[j])
-	
-	for i in range(len(xs)):
-		for j in range(len(xs)):
-			distance = (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2
-			# Try to match speed with nearby boids
-			if distance < speed_match_distance:
-				xvs[i] += (xvs[j]-xvs[i])*dt_match/len(xs)
-				yvs[i] += (yvs[j]-yvs[i])*dt_match/len(xs)
-			
-	
-	# Move according to velocities
-	for i in range(len(xs)):
-		xs[i]=xs[i]+xvs[i]
-		ys[i]=ys[i]+yvs[i]
+  # Move according to velocities
+  for i in range(length):
+    xs[i] += xvs[i]
+    ys[i] += yvs[i]
 
 
 figure=plt.figure()
