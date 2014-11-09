@@ -54,23 +54,20 @@ def fly_towards_middle(boids):
     for j,jval in enumerate(ys):
       yvs[i] += position_update(jval,ival,dt_middle,length)
 
-boids = init_boids()
-
-def update_boids(boids):
+def fly_away_from_nearby_boids(boids):
   xs,ys,xvs,yvs=boids
-  
-  fly_towards_middle(boids)
-
   length = len(xs)
-  
   for i in range(length):
-    for j in range(length):
-      distance = calculate_distance(xs[j],ys[j],xs[i],ys[i])
-      # Fly away from nearby boids    
-      if distance < clumping_distance:
-        xvs[i] += (xs[i]-xs[j])
-        yvs[i] += (ys[i]-ys[j])
-  
+      for j in range(length):
+        distance = calculate_distance(xs[j],ys[j],xs[i],ys[i])
+        # Fly away from nearby boids    
+        if distance < clumping_distance:
+          xvs[i] += (xs[i]-xs[j])
+          yvs[i] += (ys[i]-ys[j])
+
+def try_to_match_speed_with_nearby_birds(boids):
+  xs,ys,xvs,yvs=boids
+  length = len(xs)
   for i in range(length):
     for j in range(length):
       distance = calculate_distance(xs[j],ys[j],xs[i],ys[i])
@@ -79,11 +76,22 @@ def update_boids(boids):
         xvs[i] += velocity_update(xvs[j],xvs[i],dt_match,length)
         yvs[i] += velocity_update(yvs[j],yvs[i],dt_match,length)
 
-  # Move according to velocities
+def move_according_to_velocities(boids):
+  xs,ys,xvs,yvs=boids
+  length = len(xs)
   for i in range(length):
     xs[i] += xvs[i]
     ys[i] += yvs[i]
 
+boids = init_boids()
+
+def update_boids(boids):
+  xs,ys,xvs,yvs=boids
+  
+  fly_towards_middle(boids)
+  fly_away_from_nearby_boids(boids)
+  try_to_match_speed_with_nearby_birds(boids)  
+  move_according_to_velocities(boids)
 
 figure=plt.figure()
 axes=plt.axes(xlim=xlim, ylim=ylim)
