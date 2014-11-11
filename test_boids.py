@@ -1,5 +1,5 @@
-from boids import update_boids, calculate_distance, fly_towards_middle
-from nose.tools import assert_almost_equal
+from boids import *
+from nose.tools import assert_almost_equal, assert_equal
 import os
 import yaml
 
@@ -39,3 +39,33 @@ def test_fly_towards_middle():
     for after_value,before_value in zip(after,before): 
       assert_almost_equal(after_value,before_value,delta=0.01)
 
+def test_position_update():
+  assert_almost_equal(position_update(300,200,0.01,50),0.02)
+
+def test_velocity_update():
+  assert_almost_equal(velocity_update(300,10,0.01,50), 0.058)
+  
+
+def test_fly_away_from_nearby_boids():
+  regression_data=yaml.load(open(os.path.join(os.path.dirname(__file__),'fly_away_fixture.yml')))
+  boid_data=regression_data["before"]
+  fly_away_from_nearby_boids(boid_data)
+  for after,before in zip(regression_data["after"],boid_data):
+    for after_value,before_value in zip(after,before): 
+      assert_almost_equal(after_value,before_value,delta=0.01)
+
+def test_try_to_match_speed_with_nearby_birds():
+  regression_data=yaml.load(open(os.path.join(os.path.dirname(__file__),'match_speed_fixture.yml')))
+  boid_data=regression_data["before"]
+  try_to_match_speed_with_nearby_birds(boid_data)
+  for after,before in zip(regression_data["after"],boid_data):
+    for after_value,before_value in zip(after,before): 
+      assert_almost_equal(after_value,before_value,delta=0.01)
+
+def test_move_according_to_velocities():
+  regression_data=yaml.load(open(os.path.join(os.path.dirname(__file__),'move_according_to_velocities_fixture.yml')))
+  boid_data=regression_data["before"]
+  move_according_to_velocities(boid_data)
+  for after,before in zip(regression_data["after"],boid_data):
+    for after_value,before_value in zip(after,before): 
+      assert_almost_equal(after_value,before_value,delta=0.01)
