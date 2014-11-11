@@ -2,15 +2,23 @@ from boid import *
 from numpy import random
 from util import *
 
-dt_middle = 0.01
-dt_match = 0.125
-clumping_distance = 100
-speed_match_distance = 10000
+#dt_middle = 0.01
+#dt_match = 0.125
+#clumping_distance = 100
+#speed_match_distance = 10000
 
 class BoidCommander(object):
-  def __init__(self, **kwargs):
+  def __init__(self, x_pos_bound, y_pos_bound, x_velocity_bound, y_velocity_bound, dt_match, 
+      dt_middle, clumping_distance, speed_match_distance, **kwargs):
+
+    self.dt_match = dt_match
+    self.dt_middle = dt_middle
+    self.clumping_distance = clumping_distance
+    self.speed_match_distance = speed_match_distance
+    
     if "number_of_boids" in kwargs:
       self.number_of_boids = kwargs["number_of_boids"]
+      """
       self.boids = [
         Boid(random.uniform(*(kwargs["x_pos_bound"])), 
           random.uniform(*(kwargs["y_pos_bound"])),
@@ -18,6 +26,23 @@ class BoidCommander(object):
           random.uniform(*(kwargs["y_velocity_bound"])))
         for x in range(self.number_of_boids)
       ]
+      """
+      self.boids = []
+      for i in range(self.number_of_boids):
+        self.boids.append(Boid(random.uniform(*x_pos_bound), 
+          random.uniform(*y_pos_bound),
+          random.uniform(*x_velocity_bound),
+          random.uniform(*y_velocity_bound)))
+      """
+      self.boids = [
+        Boid(random.uniform(*x_pos_bound), 
+          random.uniform(*y_pos_bound),
+          random.uniform(*x_velocity_bound),
+          random.uniform(*y_velocity_bound))
+        for x in range(self.number_of_boids)
+      ]
+      """
+
     elif "init_values" in kwargs:
       xs,ys,xvs,yvs = kwargs["init_values"]
       self.number_of_boids = len(xs)
@@ -45,17 +70,17 @@ class BoidCommander(object):
   def fly_towards_middle(self):
     for b1 in self.boids:
       for b2 in self.boids:
-        b1.x_velocity += position_update(b2.x_position, b1.x_position, dt_middle, self.number_of_boids)
+        b1.x_velocity += position_update(b2.x_position, b1.x_position, self.dt_middle, self.number_of_boids)
     
     for b1 in self.boids:
       for b2 in self.boids:
-        b1.y_velocity += position_update(b2.y_position, b1.y_position, dt_middle, self.number_of_boids)
+        b1.y_velocity += position_update(b2.y_position, b1.y_position, self.dt_middle, self.number_of_boids)
 
   def fly_away_from_nearby_boids(self):
     for b1 in self.boids:
       for b2 in self.boids:
         distance = calculate_distance(b2.x_position, b2.y_position, b1.x_position, b1.y_position)
-        if distance < clumping_distance:
+        if distance < self.clumping_distance:
             b1.x_velocity+=b1.x_position - b2.x_position
             b1.y_velocity+=b1.y_position - b2.y_position
     
@@ -63,9 +88,9 @@ class BoidCommander(object):
     for b1 in self.boids:
       for b2 in self.boids:
         distance = calculate_distance(b2.x_position, b2.y_position, b1.x_position, b1.y_position)
-        if distance < speed_match_distance:
-            b1.x_velocity+=velocity_update(b2.x_velocity,b1.x_velocity, dt_match,self.number_of_boids)
-            b1.y_velocity+=velocity_update(b2.y_velocity,b1.y_velocity, dt_match,self.number_of_boids)
+        if distance < self.speed_match_distance:
+            b1.x_velocity+=velocity_update(b2.x_velocity,b1.x_velocity, self.dt_match,self.number_of_boids)
+            b1.y_velocity+=velocity_update(b2.y_velocity,b1.y_velocity, self.dt_match,self.number_of_boids)
 
   def move_according_to_velocities(self):
     for boid in self.boids:
