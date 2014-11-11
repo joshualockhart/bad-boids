@@ -1,0 +1,18 @@
+x_pos_bound : !!python/tuple [5,10]
+
+y_pos_bound : !!python/tuple [300.0,600.0]
+x_velocity_bound : !!python/tuple [0,10.0]
+y_velocity_bound : !!python/tuple [-20.0,20.0]
+
+number_of_boids : 50
+
+dt_middle : 0.01
+dt_match : 0.125
+clumping_distance : 100
+speed_match_distance : 10000
+
+xlim : !!python/tuple [-500,1500]
+ylim : !!python/tuple [-500,1500]
+
+frames : 50
+interval : 50
