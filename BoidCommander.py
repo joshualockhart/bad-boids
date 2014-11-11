@@ -1,13 +1,6 @@
 from boid import *
 from numpy import random
-def calculate_distance(xa,ya,xb,yb):
-  return (xa-xb)**2 + (ya-yb)**2
-
-def position_update(xa,xb,dt,length):
-  return (xa-xb)*dt/length
-
-def velocity_update(va,vb,dt,length):
-  return (va-vb)*dt/length
+from util import *
 
 dt_middle = 0.01
 dt_match = 0.125
